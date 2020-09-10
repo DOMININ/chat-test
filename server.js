@@ -1,5 +1,4 @@
-const express = require('express')
-const app = express()
+const app = require('express')()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 
@@ -11,11 +10,19 @@ app.get('/rooms', (req, res) => {
 
 io.on('connection', (socket) => {
   console.log('socket connected', socket.id)
+
+  socket.on('message', (msg) => {
+    io.emit('message', msg)
+  })
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected', socket.id)
+  })
 })
 
 server.listen(9999, (err) => {
   if (err) {
     throw Error(err)
   }
-  console.log('сервер запущен')
+  console.log('Сервер запущен!')
 })
