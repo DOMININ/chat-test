@@ -2,21 +2,21 @@ const app = require('express')()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 
-const rooms = new Map()
-
-app.get('/rooms', (req, res) => {
-  res.json(rooms)
-})
+let clients = {}
 
 io.on('connection', (socket) => {
-  console.log('socket connected', socket.id)
+  socket.on('auth', (data) => {
+    clients[socket.id] = { name: data.userName }
+    socket.join(data.roomName)
+    console.log(clients[socket.id].name, 'connected')
+  })
 
-  socket.on('message', (msg) => {
-    io.emit('message', msg)
+  socket.on('roomData', (data) => {
+    io.to(data.chatData.roomName).emit('roomMessage', data.message)
   })
 
   socket.on('disconnect', () => {
-    console.log('user disconnected', socket.id)
+    console.log(clients[socket.id].name, 'disconnected')
   })
 })
 
