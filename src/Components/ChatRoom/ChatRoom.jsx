@@ -9,7 +9,9 @@ const ChatRoom = ({ chatData }) => {
     socket.emit('roomData', roomData)
   }
 
-  socket.on('roomMessage', (msg) => console.log(msg))
+  socket.on('roomMessage', (msg) => {
+    console.log(msg)
+  })
 
   return (
     <div>
