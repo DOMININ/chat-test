@@ -4,6 +4,9 @@ import socket from '../../socket'
 const ChatRoom = ({ chatData }) => {
   const [message, setMessage] = useState('')
   const [dataFromServer, setDataFromServer] = useState([])
+  const [roomUsers, setRoomUsers] = useState([])
+
+  let time = '00:00'
 
   useEffect(() => {
     socket.on('roomMessage', (msg) => {
@@ -11,9 +14,26 @@ const ChatRoom = ({ chatData }) => {
     })
   }, [dataFromServer])
 
+  useEffect(() => {
+    socket.on('users', (users) => {
+      setRoomUsers(users)
+    })
+  }, [roomUsers])
+
+  const getTime = () => {
+    const data = new Date()
+    let hour = data.getHours()
+    let minutes = data.getMinutes()
+
+    hour = hour < 10 ? `0${hour}` : hour
+    minutes = minutes < 10 ? `0${minutes}` : minutes
+
+    time = `${hour}:${minutes}`
+  }
+
   const sendMsg = () => {
-    console.log(chatData)
-    const roomData = { chatData, message }
+    getTime()
+    const roomData = { chatData, message, time }
     setMessage('')
     socket.emit('roomData', roomData)
   }
@@ -21,11 +41,23 @@ const ChatRoom = ({ chatData }) => {
   return (
     <div>
       <h1>Комната: {chatData.roomName}</h1>
+      <div>
+        <h2>Пользователи</h2>
+        <ul>
+          {typeof roomUsers === 'string' ? (
+            <li>{roomUsers}</li>
+          ) : (
+            roomUsers.map((user, id) => {
+              return <li key={id}>{user}</li>
+            })
+          )}
+        </ul>
+      </div>
       <ul>
         {dataFromServer.map((data, id) => {
           return (
             <li key={id}>
-              {data.user}: {data.message}
+              {data.user} {data.time}: {data.message}
             </li>
           )
         })}
