@@ -2,6 +2,8 @@ const app = require('express')()
 const server = require('http').createServer(app)
 const io = require('socket.io')(server)
 
+const PORT = 5000
+
 let clients = {}
 
 io.on('connection', (socket) => {
@@ -12,12 +14,13 @@ io.on('connection', (socket) => {
   })
 
   socket.on('roomData', (data) => {
+    io.emit('hello', 'hello world')
+
     const msg = {
       user: data.chatData.userName,
       message: data.message,
     }
     io.to(data.chatData.roomName).emit('roomMessage', msg)
-    console.log(msg)
   })
 
   socket.on('disconnect', () => {
@@ -26,7 +29,6 @@ io.on('connection', (socket) => {
   })
 })
 
-const PORT = process.env.PORT || 5000
 server.listen(PORT, (err) => {
   if (err) {
     throw Error(err)
