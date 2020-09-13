@@ -25,6 +25,7 @@ const AuthPage = ({ onLogged, chatData }) => {
         placeholder="Название комнаты"
         value={roomName}
         onChange={(e) => setRoomName(e.target.value)}
+        onKeyPress={(e) => (e.key === 'Enter' ? logIn() : null)}
         autoFocus
       />
       <input

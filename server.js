@@ -13,11 +13,10 @@ io.on('connection', (socket) => {
     socket.join(data.roomName)
 
     roster[data.roomName] = roster[data.roomName]
-      ? [roster[data.roomName], clients[socket.id].name]
+      ? [...roster[data.roomName], clients[socket.id].name]
       : [clients[socket.id].name]
 
     io.to(data.roomName).emit('users', roster[data.roomName])
-    console.log(`${clients[socket.id].name} присоединился к комнате ${data.roomName}`)
   })
 
   socket.on('roomData', (data) => {
@@ -42,12 +41,10 @@ io.on('connection', (socket) => {
       }
 
       io.to(rooms[1]).emit('users', roster[rooms[1]])
-      console.log('Готовые данные', roster)
     }
   })
 
   socket.on('disconnect', () => {
-    console.log(clients[socket.id], 'disconnected')
     delete clients[socket.id]
   })
 })
