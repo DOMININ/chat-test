@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import './AuthPage.scss'
 import socket from '../../socket'
 
 const AuthPage = ({ onLogged, chatData }) => {
@@ -17,20 +18,24 @@ const AuthPage = ({ onLogged, chatData }) => {
   }
 
   return (
-    <form>
+    <form className="form">
       <input
+        className="form__input"
         type="text"
         placeholder="Название комнаты"
         value={roomName}
         onChange={(e) => setRoomName(e.target.value)}
+        autoFocus
       />
       <input
+        className="form__input"
         type="text"
         placeholder="Ваше имя"
         value={userName}
         onChange={(e) => setUserName(e.target.value)}
+        onKeyPress={(e) => (e.key === 'Enter' ? logIn() : null)}
       />
-      <button type="button" onClick={logIn}>
+      <button className="form__enter" type="button" onClick={logIn}>
         Войти
       </button>
     </form>
