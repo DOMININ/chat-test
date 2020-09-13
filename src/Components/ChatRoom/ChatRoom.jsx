@@ -11,21 +11,23 @@ const ChatRoom = ({ chatData }) => {
 
   let time = '00:00'
 
-  const scrollToBottom = () => {
-    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
-  }
-
   useEffect(() => {
     socket.on('roomMessage', (msg) => {
       setDataFromServer([...dataFromServer, msg])
     })
-    scrollToBottom()
+    return () => socket.off('roomMessage')
+  }, [dataFromServer])
+
+  //скролл страницы вниз при новом сообщении
+  useEffect(() => {
+    messagesEndRef.current.scrollTo(0, 99999)
   }, [dataFromServer])
 
   useEffect(() => {
     socket.on('users', (users) => {
       setRoomUsers(users)
     })
+    return () => socket.off('users')
   }, [roomUsers])
 
   const getTime = () => {
@@ -68,18 +70,21 @@ const ChatRoom = ({ chatData }) => {
       </div>
 
       <div className="chat__message">
-        <ul className="chat__message-list">
-          {dataFromServer.map((data, id) => {
-            return (
-              <li key={id} className="chat__message-item">
-                <p className="chat__message-info">
-                  <span>{data.user}</span> <span>{data.time}</span>
-                </p>
-                <p className="chat__message-msg">{data.message}</p>
-              </li>
-            )
-          })}
-          <div ref={messagesEndRef} />
+        <ul className="chat__message-list" ref={messagesEndRef}>
+          {dataFromServer.length ? (
+            dataFromServer.map((data, id) => {
+              return (
+                <li key={id} className="chat__message-item">
+                  <p className="chat__message-info">
+                    <span>{data.user}</span> <span>{data.time}</span>
+                  </p>
+                  <p className="chat__message-msg">{data.message}</p>
+                </li>
+              )
+            })
+          ) : (
+            <li className="chat__message-first">Начните диалог</li>
+          )}
         </ul>
         <div className="chat__message-actions">
           <input
